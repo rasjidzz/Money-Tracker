@@ -88,42 +88,68 @@ class _HomePageState extends State<HomePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton(
-                  onPressed: () async {
-                    Transaction? newTransaction = await showDialog<Transaction>(
-                      context: context,
-                      builder: (context) {
-                        return AddTransactionDialog(
-                            type: TransactionType.income);
+                Container(
+                  width: 70, // Width of the IconButton
+                  height: 70, // Height of the IconButton
+                  decoration: BoxDecoration(
+                    shape: BoxShape
+                        .circle, // Shape of the container, you can change it to your preference
+                    color: Colors.green, // Background color of the container
+                  ),
+                  child: IconButton(
+                      onPressed: () async {
+                        Transaction? newTransaction =
+                            await showDialog<Transaction>(
+                          context: context,
+                          builder: (context) {
+                            return AddTransactionDialog(
+                                type: TransactionType.income);
+                          },
+                        );
+                        if (newTransaction != null) {
+                          setState(() {
+                            wallet.transactions.add(newTransaction);
+                            wallet.balance += newTransaction.amount;
+                          });
+                        }
                       },
-                    );
-                    if (newTransaction != null) {
-                      setState(() {
-                        wallet.transactions.add(newTransaction);
-                        wallet.balance += newTransaction.amount;
-                      });
-                    }
-                  },
-                  child: Text('+ Income'),
+                      icon: Icon(
+                        Icons.add,
+                        size: 30,
+                        color: Colors.white,
+                      )),
                 ),
-                SizedBox(width: 20),
-                ElevatedButton(
-                  onPressed: () async {
-                    Transaction? newTransaction = await showDialog<Transaction>(
-                      context: context,
-                      builder: (context) {
-                        return AddTransactionDialog(
-                            type: TransactionType.expense);
+                SizedBox(width: 40),
+                Container(
+                  width: 70, // Width of the IconButton
+                  height: 70, // Height of the IconButton
+                  decoration: BoxDecoration(
+                    shape: BoxShape
+                        .circle, // Shape of the container, you can change it to your preference
+                    color: Colors.red, // Background color of the container
+                  ),
+                  child: IconButton(
+                      onPressed: () async {
+                        Transaction? newTransaction =
+                            await showDialog<Transaction>(
+                          context: context,
+                          builder: (context) {
+                            return AddTransactionDialog(
+                                type: TransactionType.expense);
+                          },
+                        );
+                        if (newTransaction != null) {
+                          setState(() {
+                            wallet.transactions.add(newTransaction);
+                            wallet.balance -= newTransaction.amount;
+                          });
+                        }
                       },
-                    );
-                    if (newTransaction != null) {
-                      setState(() {
-                        wallet.transactions.add(newTransaction);
-                        wallet.balance -= newTransaction.amount;
-                      });
-                    }
-                  },
-                  child: Text('- Expense'),
+                      icon: Icon(
+                        Icons.remove,
+                        size: 30,
+                        color: Colors.white,
+                      )),
                 ),
               ],
             ),
