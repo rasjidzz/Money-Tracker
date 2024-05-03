@@ -14,26 +14,6 @@ class sqlHelper {
       note TEXT
     )
   """);
-
-    //   await database.execute("""
-    //   CREATE TABLE IF NOT EXISTS categories(
-    //     id TEXT PRIMARY KEY NOT NULL,
-    //     name TEXT,
-    //     icon TEXT
-    //   )
-    // """);
-
-    //   await database.execute('''
-    //   CREATE TABLE IF NOT EXISTS wallets(
-    //     id TEXT PRIMARY KEY NOT NULL,
-    //     balance REAL
-    //   )
-    // ''');
-
-    //   await database.rawInsert('''
-    //   INSERT OR IGNORE INTO wallets(id, balance)
-    //   VALUES('1', 0)
-    // ''');
   }
 
   static Future<sql.Database> db() async {
