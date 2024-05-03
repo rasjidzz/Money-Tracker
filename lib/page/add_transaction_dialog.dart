@@ -44,6 +44,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
         : _categoriesExpense;
 
     return AlertDialog(
+      contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       title: Text(
           widget.type == TransactionType.income ? 'Add Income' : 'Add Expense'),
       content: Column(

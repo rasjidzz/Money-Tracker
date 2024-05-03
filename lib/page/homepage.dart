@@ -4,6 +4,7 @@ import 'package:money_tracker/model/wallet.dart';
 import 'package:intl/intl.dart';
 import 'package:money_tracker/model/transaction.dart';
 import 'package:money_tracker/page/add_transaction_dialog.dart';
+import 'package:money_tracker/page/historypage.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -19,17 +20,6 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _fetchTransactions();
   }
-
-  // Future<void> _fetchTransactions() async {
-  //   final database = await sqlHelper.db();
-  //   List<Map<String, dynamic>> transactionMaps =
-  //       await database.query('transactions');
-  //   List<Transaction> transactions =
-  //       transactionMaps.map((map) => Transaction.fromMap(map)).toList();
-  //   setState(() {
-  //     _transactions = transactions;
-  //   });
-  // }
 
   Future<void> _fetchTransactions() async {
     final database = await sqlHelper.db();
@@ -53,6 +43,10 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  void _updateBalanceFromDatabase() async {
+    await _fetchTransactions(); // Memperbarui saldo dari database
+  }
+
   @override
   Widget build(BuildContext context) {
     String formattedBalance =
@@ -69,19 +63,33 @@ class _HomePageState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              'Saldo',
+              'Balance',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
             SizedBox(height: 10),
-            Text(
-              formattedBalance,
-              style: TextStyle(
-                fontSize: 36,
-                fontWeight: FontWeight.bold,
-                color: Colors.green,
+            GestureDetector(
+              onTap: () {
+                // Panggil Navigator untuk berpindah halaman ke HistoryPage
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HistoryPage(
+                      saldo: wallet.balance,
+                      onDeleteTransaction: _updateBalanceFromDatabase,
+                    ),
+                  ),
+                );
+              },
+              child: Text(
+                formattedBalance,
+                style: TextStyle(
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
               ),
             ),
             SizedBox(height: 20),
