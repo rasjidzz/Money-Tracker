@@ -55,7 +55,11 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: Text('Money Tracker'),
+        title: Text(
+          'Money Tracker',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26),
+        ),
+        backgroundColor: Colors.blue,
       ),
       body: Center(
         child: Column(

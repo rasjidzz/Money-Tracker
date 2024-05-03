@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:money_tracker/helper/sql_helper.dart';
+import 'package:money_tracker/model/category.dart';
 import 'package:money_tracker/model/transaction.dart';
 
 class HistoryPage extends StatefulWidget {
@@ -16,6 +17,17 @@ class HistoryPage extends StatefulWidget {
 class _HistoryPageState extends State<HistoryPage> {
   late Future<List<Transaction>> _futureTransactions = Future.value([]);
   late double _balance;
+
+  List<Category> _categoriesIncome = [
+    Category(id: '1', name: 'Salary', icon: Icons.work),
+    Category(id: '2', name: 'Gift', icon: Icons.redeem),
+  ];
+
+  List<Category> _categoriesExpense = [
+    Category(id: '4', name: 'Food', icon: Icons.restaurant),
+    Category(id: '5', name: 'Others', icon: Icons.payment),
+    Category(id: '6', name: 'Transportation', icon: Icons.train),
+  ];
 
   @override
   void initState() {
@@ -54,11 +66,63 @@ class _HistoryPageState extends State<HistoryPage> {
     widget.onDeleteTransaction();
   }
 
+  void _showTransactionDetailsDialog(Transaction transaction) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Transaction Details'),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Date: ${DateFormat.yMMMMd().format(transaction.date)}'),
+              Text('Category: ${transaction.category}'),
+              Text(
+                  'Amount: ${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp').format(transaction.amount)}'),
+              Text('Note: ${transaction.note}'),
+            ],
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Icon _getCategoryIcon(Transaction transaction) {
+    IconData iconData = Icons.category;
+    if (transaction.type == TransactionType.income) {
+      for (var category in _categoriesIncome) {
+        if (category.name == transaction.category) {
+          iconData = category.icon;
+          break;
+        }
+      }
+    } else {
+      for (var category in _categoriesExpense) {
+        if (category.name == transaction.category) {
+          iconData = category.icon;
+          break;
+        }
+      }
+    }
+    return Icon(iconData);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('History'),
+        title: Text('History',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26)),
+        backgroundColor: Colors.blue, // warna AppBar
       ),
       body: FutureBuilder<List<Transaction>>(
         future: _futureTransactions,
@@ -91,23 +155,48 @@ class _HistoryPageState extends State<HistoryPage> {
                     itemBuilder: (context, index) {
                       Transaction transaction = snapshot.data![index];
                       return ListTile(
-                        leading: Icon(
-                          transaction.type == TransactionType.income
-                              ? Icons.arrow_upward
-                              : Icons.arrow_downward,
-                          color: transaction.type == TransactionType.income
-                              ? Colors.green
-                              : Colors.red,
+                        contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16.0, vertical: 8.0),
+                        tileColor: Colors.white, // warna latar belakang
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                              12.0), // membuat sudut terbulat
+                        ),
+                        leading: Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey
+                                    .withOpacity(0.5), // warna bayangan
+                                spreadRadius:
+                                    2, // seberapa jauh bayangan menyebar
+                                blurRadius: 3, // seberapa kabur bayangan
+                                offset: Offset(0, 2), // posisi bayangan
+                              ),
+                            ],
+                          ),
+                          child: CircleAvatar(
+                            backgroundColor:
+                                transaction.type == TransactionType.income
+                                    ? Colors.green
+                                    : Colors.red,
+                            child: Icon(
+                              transaction.type == TransactionType.income
+                                  ? Icons.arrow_downward
+                                  : Icons.arrow_upward,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                         title: Text(transaction.category),
                         subtitle: Text(
-                            '${DateFormat.yMMMMd().format(transaction.date)} - ${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp').format(transaction.amount)}'),
-                        // trailing: IconButton(
-                        //   icon: Icon(Icons.delete),
-                        //   onPressed: () {
-                        //     _deleteTransaction(transaction.id);
-                        //   },
-                        // ),
+                          '${DateFormat.yMMMMd().format(transaction.date)} - ${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp').format(transaction.amount)}',
+                        ),
+                        trailing: _getCategoryIcon(transaction),
+                        onTap: () {
+                          _showTransactionDetailsDialog(transaction);
+                        },
                         onLongPress: () {
                           showDialog(
                             context: context,
@@ -132,15 +221,6 @@ class _HistoryPageState extends State<HistoryPage> {
                               ],
                             ),
                           );
-                        },
-                        onTap: () {
-                          showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  title: const Text('More Information'),
-                                );
-                              });
                         },
                       );
                     },
